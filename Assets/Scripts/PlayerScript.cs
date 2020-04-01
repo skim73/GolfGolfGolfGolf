@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using Mirror;
 using Random = UnityEngine.Random;
+using UnityEngine.UI;
 
 public class PlayerScript : NetworkBehaviour
 {
@@ -403,6 +404,10 @@ public class PlayerScript : NetworkBehaviour
                     using_fireproof = true;
                 }
                 this.power_up = null;
+
+                GameObject powerUpCanvas = GameObject.FindGameObjectWithTag("PowerUpCanvas");
+                powerUpCanvas.GetComponentInChildren<Text>().text = "Power Up: \nNULL";
+                Debug.Log(powerUpCanvas.GetComponentInChildren<Text>().text);
             }
         }
     }

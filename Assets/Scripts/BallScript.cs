@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System;
 using Mirror;
 public class BallScript : NetworkBehaviour
@@ -35,6 +36,12 @@ public class BallScript : NetworkBehaviour
             PowerUp powerUpType = collider.gameObject.GetComponent<PowerUpController>().GetPowerUp();
             collider.gameObject.GetComponent<PowerUpController>().PickUp();
             ENTITY.GetComponent<PlayerScript>().pickedUpPowerUp(powerUpType);
+
+            GameObject powerUpCanvas = GameObject.FindGameObjectWithTag("PowerUpCanvas");
+            Text powerUpText = powerUpCanvas.GetComponentInChildren<Text>();
+            Debug.Log(powerUpText.text);
+            powerUpText.text = "Power Up: \n" + powerUpType.name;
+            Debug.Log(powerUpText.text);
         }
         
         else if (collider.gameObject.tag == "SpeedUp")
