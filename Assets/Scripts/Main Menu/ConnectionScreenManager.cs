@@ -31,6 +31,8 @@ public class ConnectionScreenManager : MonoBehaviour
     public void Start()
     {
         MAIN_GAME_CONTROLLER = MAIN_GAME_CONTROLLER_OBJECT.GetComponent<MainGameController>();
+        selected_name = "Host";
+        MAIN_GAME_CONTROLLER.set_name_and_color(selected_name, selected_color);
         StartCoroutine(CheckIP());
         if ( update_player_list == false)
         {
@@ -97,12 +99,10 @@ public class ConnectionScreenManager : MonoBehaviour
         if ( update_player_list)
         {
             MAIN_GAME_CONTROLLER.refresh_player_list();
-            MAIN_GAME_CONTROLLER.set_name_and_color(selected_name, selected_color);
             string players_list = "";
             foreach (DictionaryEntry entity_entry in MAIN_GAME_CONTROLLER.players_hash)
             {
                 GameObject networked_entity = (GameObject)(entity_entry.Value);
-                Debug.Log("HERE");
                 string name = networked_entity.GetComponent<PlayerScript>().PLAYER_NAME;
                 if (networked_entity == MAIN_GAME_CONTROLLER.local_player)
                     name = name + " (You)";
@@ -125,6 +125,11 @@ public class ConnectionScreenManager : MonoBehaviour
                 update_player_list = true;
             }
         }
+    }
+
+    public void start_game()
+    {
+        MAIN_GAME_CONTROLLER.ServerChangeScene("World 1");
     }
 
     public void save_preferences()

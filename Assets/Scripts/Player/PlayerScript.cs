@@ -74,16 +74,7 @@ public class PlayerScript : NetworkBehaviour
         this.transform.rotation = START.transform.rotation;
         BALL.transform.position = START.transform.position + new Vector3(0, .05f, 0);
         ball_rb = BALL.GetComponent<Rigidbody>();
-        if (BALL_COLOR == null)
-        {
-            BALL_COLOR = new Color(
-                Random.Range(0f, 1f),
-                Random.Range(0f, 1f),
-                Random.Range(0f, 1f)
-            );
-        }
         ball_rb.maxAngularVelocity = 100000;
-        BALL.GetComponent<MeshRenderer>().material.color = BALL_COLOR;
         POINTER.transform.localScale = new Vector3(5 * POINTER_LENGTH, 1, POINTER_LENGTH);
         POINTER.transform.localPosition = new Vector3(POINTER.transform.localScale.x * 5, BALL.transform.localScale.y / -2.1f, 0);
         _next_turn();
@@ -92,6 +83,7 @@ public class PlayerScript : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
+        BALL.GetComponent<MeshRenderer>().material.color = BALL_COLOR;
         if (!base.hasAuthority)
         {
             return;
@@ -278,6 +270,7 @@ public class PlayerScript : NetworkBehaviour
     {
         PLAYER_NAME = name;
         BALL_COLOR = color;
+        BALL.GetComponent<MeshRenderer>().material.color = BALL_COLOR;
     }
 
     [Command]

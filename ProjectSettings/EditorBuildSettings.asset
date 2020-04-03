@@ -5,15 +5,15 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
+    path: Assets/Scenes/Menu.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
     path: Assets/Scenes/World 1.unity
     guid: dfc0a9312ce24c949aefa5393d5866e1
   - enabled: 0
     path: Assets/Scenes/Audrey's Scene.unity
     guid: 8c6d6fb5d271de84a8926f06abbe8199
-  - enabled: 1
-    path: Assets/Scenes/Menu.unity
-    guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
     path: Assets/Scenes/Windmill farm.unity
     guid: 6a2ab46fabd9bed4dac3f4112bb6b001
