@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 
+
 public class MainMenuController : MonoBehaviour
 {
 	public GameObject main_screen;
@@ -8,7 +9,6 @@ public class MainMenuController : MonoBehaviour
 	public GameObject join_game_screen;
 	public GameObject settings_screen;
 	public GameObject credits_screen;
-	public string	  ip;
 
 	void Update()
 	{
@@ -71,11 +71,6 @@ public class MainMenuController : MonoBehaviour
 		settings_screen.SetActive(false);
 		host_game_screen.SetActive(false);
 		join_game_screen.SetActive(false);
-	}
-
-	public void GetIPAddress()
-	{
-		ip = "127.0.0.1";// NetworkManager.singleton.networkAddress;
 	}
 
 	public void Volume()

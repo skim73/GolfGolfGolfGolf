@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: 1096873767998630473}
   m_Layer: 0
   m_Name: Networked Entity
-  m_TagString: Untagged
+  m_TagString: Client
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -79,7 +79,8 @@ MonoBehaviour:
   POINTER: {fileID: 8111257610626238059}
   START: {fileID: 3784376044779495935, guid: 21e3e4bd62f4f6548aae3c19e031c463, type: 3}
   GOAL: {fileID: 8710377763397410942, guid: 9f85eb7715b81fd4e8fc5547c3c049f0, type: 3}
-  PLAYER_NAME: 
+  PLAYER_NAME: Host
+  is_host: 0
   BALL_COLOR: {r: 0, g: 0, b: 0, a: 0}
   TIME_TILL_DEATH: 2.5
   THRUST_MULTIPLIER: 25
@@ -506,6 +507,8 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   ENTITY: {fileID: 8111257610182996412}
+  SPEED_UP_SPEED: 1.5
+  FIRE_FORCE: 15
   coolDownTimer: 0
 --- !u!1 &8111257611005552941
 GameObject:
