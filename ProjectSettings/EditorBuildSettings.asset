@@ -5,10 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/World 1.unity
     guid: dfc0a9312ce24c949aefa5393d5866e1
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Audrey's Scene.unity
     guid: 8c6d6fb5d271de84a8926f06abbe8199
   - enabled: 1

@@ -1,0 +1,62 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Networking;
+using Mirror;
+
+[RequireComponent(typeof(NetworkManager))]
+public class MainGameController : MonoBehaviour
+{
+    NetworkManager NETWORK_MANAGER;
+    //Hash table with keys being <NetworkIdentity, Networked Entity >
+    public Hashtable players_hash = new Hashtable();
+    public GameObject local_player;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        NETWORK_MANAGER = GetComponent<NetworkManager>();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (players_hash.Count != NETWORK_MANAGER.numPlayers)
+        {
+            Debug.Log(NETWORK_MANAGER.numPlayers + " players now connected");
+            players_hash.Clear();
+            foreach (GameObject networked_entity in GameObject.FindGameObjectsWithTag("Client"))
+            {
+                players_hash.Add(networked_entity.GetComponent<NetworkIdentity>(), networked_entity);
+                if (networked_entity.GetComponent<NetworkIdentity>().hasAuthority)
+                    local_player = networked_entity;
+            };
+        }
+    }
+
+    public void refresh_player_list()
+    {
+        players_hash.Clear();
+        Debug.Log("HEREHREHRE");
+        foreach (GameObject networked_entity in GameObject.FindGameObjectsWithTag("Client"))
+        {
+            Debug.Log("Here1");
+            players_hash.Add(networked_entity.GetComponent<NetworkIdentity>(), networked_entity);
+            if (networked_entity.GetComponent<NetworkIdentity>().hasAuthority)
+                local_player = networked_entity;
+        };
+    }
+
+    public ushort get_port() { return this.GetComponent<TelepathyTransport>().port; }
+
+    public void set_name_and_color(string name, Color color)
+    {
+        local_player.GetComponent<PlayerScript>().Cmd_set_name_and_color(name, color);
+    }
+
+
+    public void start_host() { NETWORK_MANAGER.StartHost(); }
+    public void stop_host() { NETWORK_MANAGER.StopHost(); }
+    public void start_client(string address) { NETWORK_MANAGER.StartClient(); NETWORK_MANAGER.networkAddress = address; }
+    public void stop_client() { NETWORK_MANAGER.StopClient(); }
+}

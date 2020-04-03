@@ -8,6 +8,8 @@ TagManager:
   - PowerUp
   - Death
   - ball
+  - BGM
+  - Client
   layers:
   - Default
   - TransparentFX
