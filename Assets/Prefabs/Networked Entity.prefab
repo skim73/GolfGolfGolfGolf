@@ -77,10 +77,8 @@ MonoBehaviour:
   GOLF_CLUB: {fileID: 8111257610540916684}
   BALL: {fileID: 8111257610857308473}
   POINTER: {fileID: 8111257610626238059}
-  START: {fileID: 3784376044779495935, guid: 21e3e4bd62f4f6548aae3c19e031c463, type: 3}
-  GOAL: {fileID: 8710377763397410942, guid: 9f85eb7715b81fd4e8fc5547c3c049f0, type: 3}
+  WORLD_MANAGER: {fileID: 0}
   PLAYER_NAME: Host
-  is_host: 0
   BALL_COLOR: {r: 0, g: 0, b: 0, a: 0}
   TIME_TILL_DEATH: 2.5
   THRUST_MULTIPLIER: 25
@@ -91,6 +89,7 @@ MonoBehaviour:
   HIT_TIMER: 0.05
   BALL_STOPPING_SPEED: 0.5
   play_state: 0
+  score: 0
   last_valid_position: {x: 0, y: 0, z: 0}
   in_death_zone: 0
 --- !u!114 &668851320573419038

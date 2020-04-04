@@ -10,6 +10,11 @@ TagManager:
   - ball
   - BGM
   - Client
+  - Fire
+  - PowerUpCanvas
+  - SpeedUp
+  - Ball
+  - Start
   layers:
   - Default
   - TransparentFX

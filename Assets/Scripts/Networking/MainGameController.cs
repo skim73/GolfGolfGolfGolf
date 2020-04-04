@@ -53,7 +53,6 @@ public class MainGameController : MonoBehaviour
         players_hash.Clear();
         foreach (GameObject networked_entity in GameObject.FindGameObjectsWithTag("Client"))
         {
-            Debug.Log(networked_entity);
             players_hash.Add(networked_entity.GetComponent<NetworkIdentity>(), networked_entity);
             if (networked_entity.GetComponent<NetworkIdentity>().hasAuthority)
             {

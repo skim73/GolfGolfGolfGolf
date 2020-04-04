@@ -13,8 +13,7 @@ public class PlayerScript : NetworkBehaviour
     public GameObject GOLF_CLUB;
     public GameObject BALL;
     public GameObject POINTER;
-    public GameObject START;
-    public GameObject GOAL;
+    public GameWorldController WORLD_MANAGER;
     public String PLAYER_NAME = "Host";
     public Color BALL_COLOR;
     public float TIME_TILL_DEATH = 2.5f;
@@ -27,6 +26,7 @@ public class PlayerScript : NetworkBehaviour
     public float BALL_STOPPING_SPEED = .5f;
     public PLAY_STATE play_state = PLAY_STATE.waiting_for_player;
     public PowerUp power_up;
+    public int score = -1;
 
     private float strength = 0.0f;
     private float left_mouse_x = 0.0f;
@@ -67,27 +67,31 @@ public class PlayerScript : NetworkBehaviour
     }
 
     // Start is called before the first frame update
-    public override void OnStartAuthority()
+    void Start()
     {
-        START = GameObject.Find("Start");
-        this.transform.position = START.transform.position + new Vector3(0, .05f, 0);
-        this.transform.rotation = START.transform.rotation;
-        BALL.transform.position = START.transform.position + new Vector3(0, .05f, 0);
-        ball_rb = BALL.GetComponent<Rigidbody>();
-        ball_rb.maxAngularVelocity = 100000;
+        if (GameObject.Find("Game World Controller"))
+            WORLD_MANAGER = GameObject.Find("Game World Controller").GetComponent<GameWorldController>();
         POINTER.transform.localScale = new Vector3(5 * POINTER_LENGTH, 1, POINTER_LENGTH);
-        POINTER.transform.localPosition = new Vector3(POINTER.transform.localScale.x * 5, BALL.transform.localScale.y / -2.1f, 0);
-        _next_turn();
+        POINTER.transform.localPosition = new Vector3(POINTER.transform.localScale.x * 5, BALL.transform.localScale.y / -2.15f, 0);
+        if (WORLD_MANAGER)
+            next_level();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (WORLD_MANAGER == false)
+            return;
+        if (ball_rb == false)
+        {
+            ball_rb = BALL.GetComponent<Rigidbody>();
+            ball_rb.maxAngularVelocity = 100000;
+        }
         BALL.GetComponent<MeshRenderer>().material.color = BALL_COLOR;
         if (!base.hasAuthority)
-        {
             return;
-        }
+        //Tell all other clients your game state
+        Cmd_publish_game_state(this.play_state);
         _handle_right_click();
         _handle_ws();
         _handle_ad();
@@ -108,6 +112,7 @@ public class PlayerScript : NetworkBehaviour
                 _handle_arrow_keys();
                 break;
             case PLAY_STATE.hitting_ball:
+                Debug.Log("Hitting");
                 if (timer > 0)
                 {
                     GOLF_CLUB.transform.Rotate(0, -1 * last_strength * Time.deltaTime / HIT_TIMER, 0);
@@ -188,10 +193,21 @@ public class PlayerScript : NetworkBehaviour
     private void _next_turn()
     {
         Cmd_enable_golf_club();
+        Cmd_increase_score();
         last_strength = 0;
         ROTATOR.transform.position = BALL.transform.position;
         last_valid_position = BALL.transform.position;
         play_state = PLAY_STATE.waiting_for_player;
+    }
+
+    public void next_level()
+    {
+        Transform start = WORLD_MANAGER.get_start_transform_for_next_level();
+        this.transform.position = start.position + new Vector3(0, .05f, 0);
+        this.transform.localRotation = start.rotation;
+        ROTATOR.transform.localRotation = Quaternion.identity;
+        BALL.transform.position = start.position + new Vector3(0, .05f, 0);
+        _next_turn();
     }
 
     private void _handle_arrow_keys()
@@ -241,7 +257,7 @@ public class PlayerScript : NetworkBehaviour
         {
             if (last_strength > STRENGTH_THRESHOLD)
             {
-                play_state = PLAY_STATE.hitting_ball;
+                this.play_state = PLAY_STATE.hitting_ball;
                 timer = HIT_TIMER;
             }
             left_mouse_clicked = false;
@@ -257,44 +273,6 @@ public class PlayerScript : NetworkBehaviour
 
             last_strength = strength;
         }
-    }
-
-    [Command]
-    public void Cmd_set_name_and_color(string name, Color color)
-    {
-        Rpc_set_name_and_color(name, color);
-    }
-
-    [ClientRpc]
-    void Rpc_set_name_and_color(string name, Color color)
-    {
-        PLAYER_NAME = name;
-        BALL_COLOR = color;
-        BALL.GetComponent<MeshRenderer>().material.color = BALL_COLOR;
-    }
-
-    [Command]
-    void Cmd_disable_golf_club()
-    {
-        Rpc_disable_golf_club();
-    }
-
-    [ClientRpc]
-    void Rpc_disable_golf_club()
-    {
-        ROTATOR.SetActive(false);
-    }
-
-    [Command]
-    void Cmd_enable_golf_club()
-    {
-        Rpc_enable_golf_club();
-    }
-
-    [ClientRpc]
-    void Rpc_enable_golf_club()
-    {
-        ROTATOR.SetActive(true);
     }
 
     private void _handle_right_click()
@@ -416,10 +394,8 @@ public class PlayerScript : NetworkBehaviour
         }
     }
 
-    public void pickedUpPowerUp(PowerUp power_up)
-    {
-        this.power_up = power_up;
-    }
+    public void pickedUpPowerUp(PowerUp power_up) { this.power_up = power_up; }
+
     private void _resetOnDeath()
     {
         Debug.Log("reseting from death");
@@ -435,14 +411,45 @@ public class PlayerScript : NetworkBehaviour
         in_death_zone = true;
         death_zone_timer = TIME_TILL_DEATH;
     }
-    public void exitDeathZone()
-    {
-        in_death_zone = false;
-    }
+    public void exitDeathZone() { in_death_zone = false; }
 
     // Sabin Kim: getter for bool using_fireproof
-    public bool isUsingFireProof()
-    {
-        return using_fireproof;
-    }
+    public bool isUsingFireProof() { return using_fireproof; }
+
+
+    /*************************************************
+     * Command functions are called by the player with authority
+     * They call the ClientRpc method of all other clients
+     * This is how all information has to be passed from 1 client to another
+     *************************************************/
+    [Command]
+    public void Cmd_set_name_and_color(string name, Color color) { Rpc_set_name_and_color(name, color); }
+
+    [ClientRpc]
+    void Rpc_set_name_and_color(string name, Color color) { PLAYER_NAME = name; BALL_COLOR = color; BALL.GetComponent<MeshRenderer>().material.color = BALL_COLOR; }
+
+    [Command]
+    void Cmd_disable_golf_club() { Rpc_disable_golf_club(); }
+
+    [ClientRpc]
+    void Rpc_disable_golf_club() { ROTATOR.SetActive(false); }
+
+    [Command]
+    void Cmd_enable_golf_club() { Rpc_enable_golf_club(); }
+
+    [ClientRpc]
+    void Rpc_enable_golf_club() { ROTATOR.SetActive(true); }
+
+    [Command]
+    void Cmd_increase_score() { Rpc_increase_score(); }
+
+    [ClientRpc]
+    void Rpc_increase_score() { this.score++; }
+
+    [Command]
+    public void Cmd_publish_game_state( PLAY_STATE play_state ) { Rpc_publish_game_state(play_state); }
+
+    [ClientRpc]
+    public void Rpc_publish_game_state(PLAY_STATE play_state) { if (!base.hasAuthority ) this.play_state = play_state; }
+
 }
